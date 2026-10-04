@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package bridge;
+
+message AuthRequest {
+  string email = 1;
+  string password = 2;
+  string provider = 3;
+  string token = 4;
+}
+
+message AuthResponse {
+  string access_token = 1;
+  string token_type = 2;
+  int32 expires_in = 3;
+  User user = 4;
+}
+
+message User {
+  int32 id = 1;
+  string email = 2;
+  string username = 3;
+  string created_at = 4;
+}
+
+message Video {
+  int32 id = 1;
+  int32 user_id = 2;
+  string title = 3;
+  string url = 4;
+  int32 likes = 5;
+}
+
+message VideoFeed {
+  repeated Video videos = 1;
+}
+
+message Character {
+  int32 id = 1;
+  int32 user_id = 2;
+  string name = 3;
+  string outfit = 4;
+}
+
+message CharacterList {
+  repeated Character characters = 1;
+}
+
+message Crew {
+  int32 id = 1;
+  string name = 2;
+  int32 created_by = 3;
+}
+
+message CrewList {
+  repeated Crew crews = 1;
+}
+
+message Message {
+  int64 id = 1;
+  int32 room_id = 2;
+  int32 user_id = 3;
+  string content = 4;
+}
+
+message ChatHistory {
+  repeated Message messages = 1;
+}
