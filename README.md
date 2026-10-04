@@ -6,7 +6,7 @@ A complete replacement for the original C#/.NET Frever backend — running as a 
 
 - **Node.js** server using `protobufjs` to speak the same protobuf-net protocol the Frever client expects
 - **Single `/reroute` gateway** — no REST adapter layer, no Xano, no Termux
-- **SQLite** database (file-based, no server install)
+- **SQLite** database via `sql.js` (pure JavaScript, no native compilation needed)
 - **Render** for cloud hosting (free tier) — or run locally with `npm start`
 
 ## Step-by-step setup
@@ -38,7 +38,7 @@ After creating the service, go to **Settings** → **Environment** and set these
 | `VIDEO_BASE_URL` | `http://YOUR_RENDER_URL:3000` | Base URL for video assets (set to your Render URL) |
 | `AVATAR_BASE_URL` | `http://YOUR_RENDER_URL:3000` | Base URL for avatars (set to your Render URL) |
 
-> Avatars and in-app accessories are built into the Frever client — they don't need external hosting. Set both URL vars to your Render app URL or leave them as-is for local use.
+> Avatars and in-app accessories are built into the Frever client and don't need external hosting. Set both URL vars to your Render app URL or leave them as-is for local use.
 
 ### 4. Deploy
 
@@ -66,6 +66,14 @@ The patcher modifies `global-metadata.dat` inside the APK, replacing the origina
 2. Open Frever — it will connect to your server
 3. Register a new account (the server creates users in SQLite)
 4. Done — you're running a private Frever server
+
+## Deploy fix (2026-10-04)
+
+The initial deploy failed because `better-sqlite3` v9.x requires native C++ compilation that breaks on Render's Node.js v24 runtime. The fix:
+
+- Replaced `better-sqlite3` with `sql.js` — a pure JavaScript SQLite implementation with no native bindings
+- Updated `src/database.js` to use `sql.js` API (`new SQL.Database()`, `db.exec()`, `db.prepare()`, `db.export()`)
+- Fixed route files that used `stmt.run().lastInsertRowid` — `sql.js` returns `undefined` from `run()`, so we now query `last_insert_rowid()` explicitly
 
 ## API endpoints
 
