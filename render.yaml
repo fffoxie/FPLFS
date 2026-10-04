@@ -1,0 +1,20 @@
+# render.yaml - Render Web Service Configuration
+
+services:
+  - type: web
+    name: fplfs-frever-server
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: JWT_SECRET
+        value: change-me-to-a-secure-random-string
+      - key: PORT
+        value: 3000
+      - key: VIDEO_BASE_URL
+        value: https://example.com/videos
+      - key: AVATAR_BASE_URL
+        value: https://example.com/avatars
+    plan: free
+    region: iad
+    branch: main
