@@ -1,12 +1,13 @@
-# FPLFS Setup Guide — Cloud Deployment via Rainway
+# FPLFS Setup Guide — Cloud Deployment via Render
 
 ## Overview
-Set up the Frever Private Local Server (FPLFS) entirely in the cloud using Rainway. $0 budget, school-browser friendly.
+Set up the Frever Private Local Server (FPLFS) entirely in the cloud using Render. $0 budget, school-browser friendly.
 
 ## Prerequisites
-- Rainway account (free at https://rainway.com)
+- GitHub account (school account)
+- Render account (free tier at https://render.com)
 - Phone with Frever APK installed
-- Same WiFi network as your Rainway-hosted server (or Rainway's public tunnel)
+- Same WiFi network as your phone (or Render's public URL)
 
 ## Step 1: Fork the Repository
 
@@ -14,56 +15,49 @@ Set up the Frever Private Local Server (FPLFS) entirely in the cloud using Rainw
 2. Click **Fork**
 3. Your fork: https://github.com/YOUR_USERNAME/FPLFS
 
-## Step 2: Deploy on Rainway
+## Step 2: Deploy on Render
 
-### 2.1 Sign up for Rainway
-1. Go to https://rainway.com
+### 2.1 Sign up for Render
+1. Go to https://render.com
 2. Sign up (free tier)
-3. Download the Rainway app to your computer
-4. Install and sign in
+3. Connect your GitHub account
 
-### 2.2 Open your repo in Rainway's cloud computer
-1. In Rainway, open **Files** or connect to your cloud computer
-2. Clone your forked repo:
-```bash
-git clone https://github.com/YOUR_USERNAME/FPLFS.git
-cd FPLFS
-```
+### 2.2 Create a new Web Service
+1. In Render dashboard, click **New** → **Web Service**
+2. Connect your GitHub account
+3. Select your forked repo: `YOUR_USERNAME/FPLFS`
+4. Render will auto-detect it as a Node.js app
 
-### 2.3 Install dependencies
-```bash
-npm install
-mkdir data
-```
+### 2.3 Configure the service
+- **Build Command**: `npm install`
+- **Start Command**: `npm start`
+- **Instance Type**: Free (`free`)
+- **Environment Variables** (add these in the Render dashboard):
 
-### 2.4 Create .env file
-```bash
-cat > .env << 'EOF'
-JWT_SECRET=your-super-secret-key-here
-VIDEO_BASE_URL=https://example.com/videos
-AVATAR_BASE_URL=https://example.com/avatars
-PORT=3000
-EOF
-```
+| Key | Value |
+|-----|-------|
+| `JWT_SECRET` | `your-super-secret-key-here` |
+| `PORT` | `3000` |
+| `VIDEO_BASE_URL` | `https://example.com/videos` |
+| `AVATAR_BASE_URL` | `https://example.com/avatars` |
 
-### 2.5 Start the server
-```bash
-npm start
-```
+### 2.4 Deploy
+1. Click **Create Web Service**
+2. Wait for deployment (2-3 minutes)
+3. Copy the Render URL (format: `https://your-app.onrender.com`)
 
-Rainway exposes port 3000 through its tunnel. Copy the Rainway URL (format: `https://[id].play.rainway.com`).
-
-### 2.6 Keep the server running
-Leave the terminal open. Rainway keeps the session alive while connected.
+### 2.5 Verify deployment
+- Visit `https://your-app.onrender.com/health` — should return `{"status": "ok"}`
+- Visit `https://your-app.onrender.com/api/client/urls` — should return video/avatar URLs
 
 ## Step 3: Patch the APK
 
 ### 3.1 Download the pre-patched APK
 - https://gofile.io/d/yvEYLNE4
 
-### 3.2 Or patch your own APK for Rainway
+### 3.2 Or patch your own APK for Render
 ```bash
-python3 patcher.py original.apk https://YOUR_ID.play.rainway.com
+python3 patcher.py original.apk https://your-app.onrender.com
 ```
 
 ## Step 4: Connect Phone
@@ -72,30 +66,34 @@ python3 patcher.py original.apk https://YOUR_ID.play.rainway.com
 2. Enable unknown apps: **Settings → Apps → Special Access → Install unknown apps**
 3. Open downloaded APK → **Install**
 4. Open Frever → login/register
-5. Videos should load from your cloud server
+5. Videos should load from your Render server
 
 ## Step 5: Verify Everything Works
 
-- Health check: `curl https://YOUR_ID.play.rainway.com/health`
-- Client URLs: `curl https://YOUR_ID.play.rainway.com/api/client/urls`
-- Supported versions: `curl https://YOUR_ID.play.rainway.com/api/Client/SupportedVersions`
+- Health check: `curl https://your-app.onrender.com/health`
+- Client URLs: `curl https://your-app.onrender.com/api/client/urls`
+- Supported versions: `curl https://your-app.onrender.com/api/Client/SupportedVersions`
 
 ## Troubleshooting
 
-### Server won't start on Rainway
-- Check Node version: `node --version` (needs 18+)
-- Delete node_modules and retry: `rm -rf node_modules && npm install`
-- Check port isn't blocked: `netstat -tlnp | grep 3000`
+### Server won't start on Render
+- Check build logs in Render dashboard
+- Verify `start` script in `package.json`
+- Check `node --version` compatibility (needs 18+)
 
-### Phone can't connect to Rainway URL
-- Make sure both devices are on the same network (or Rainway tunnel handles it)
+### Phone can't connect to Render URL
+- Make sure both devices are on the same network (or Render's public URL handles it)
 - Try a different port in `.env` (e.g., `PORT=4000`)
-- Check Rainway's firewall/port settings
+- Check Render's firewall/port settings
 
-### Permission errors on Rainway
-- Rainway cloud computer may have restricted permissions
-- Try a port above 1024 (e.g., 3000, 4000, 8080)
-- Run `npm start` without sudo
+### Free tier limitations
+- Render free tier spins down after 15 minutes of inactivity
+- First request after spin-down takes ~30 seconds to wake up
+- This is normal — just wait and retry
+
+### Permission errors on Render
+- Render handles port binding automatically
+- Use `process.env.PORT` (already configured in `src/index.js`)
 
 ## File Structure
 
@@ -128,18 +126,29 @@ FPLFS/
 ## Quick Reference
 
 ```bash
-# Clone and setup
+# Clone and setup locally
 git clone https://github.com/YOUR_USERNAME/FPLFS.git
 cd FPLFS
 npm install
 mkdir data
 
-# Start server
+# Start server locally
 npm start
 
-# Patch APK for Rainway URL
-python3 patcher.py Frever.apk https://YOUR_ID.play.rainway.com
+# Patch APK for Render URL
+python3 patcher.py Frever.apk https://your-app.onrender.com
 ```
+
+## Render vs Local WiFi
+
+| | Local WiFi | Render |
+|---|----------|--------|
+| Cost | $0 | $0 (free tier) |
+| Requires same network | Yes | No |
+| Phone on cellular data | No | Yes |
+| Setup complexity | Low | Medium |
+| Speed | Fast (LAN) | Depends on internet |
+| Spin-down | N/A | After 15 min idle |
 
 ---
 **Created by FFFoxie • MIT License**
