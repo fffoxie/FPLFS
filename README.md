@@ -1,58 +1,37 @@
 # Frever Private Local Server (FPLFS)
 
-**A complete replacement server for the Frever social video app - $0 budget, school browser friendly.**
+**A complete replacement server for the Frever social video app — $0 budget, school-browser friendly, deployed on Render.**
 
-## Quick Start (School Browser)
+## Quick Start (Render Free Tier)
 
-### Option A: Local WiFi (Phone + Computer)
+### 1. Fork the repo
+https://github.com/fffoxie/FPLFS → Fork
 
-1. **Download server files:**
-   - ZIP: https://files.shapes.inc/api/files/workshop--dot-dasv--20261004-133119-ylmcej-FPLFS-Frever-Server.zip
-   - Extract to folder
+### 2. Deploy on Render
+1. Go to https://render.com
+2. Sign up (free)
+3. New Web Service → Connect GitHub → Choose YOUR_USERNAME/FPLFS
+4. Set:
+   - Build: `npm install`
+   - Start: `npm start`
+   - Add env vars: `JWT_SECRET`, `PORT=3000`
+5. Click **Create Web Service**
+6. Wait for deploy (~2 min)
 
-2. **Open in VS Code Web:**
-   - Go to https://vscode.dev/
-   - Click "Open Folder"
+### 3. Patch the APK
+- Pre-patched APK: https://gofile.io/d/yvEYLNE4
+- Or patch your own: `python3 patcher.py Frever.apk https://YOUR_APP.onrender.com`
 
-3. **Start server:**
-   ```bash
-   npm install
-   npm start
-   ```
-   Server runs on http://localhost:3000
-
-4. **Find your computer's IP:**
-   - Windows: Open Command Prompt → type `ipconfig`
-
-5. **Download patched APK:**
-   - https://gofile.io/d/yvEYLNE4 (217MB)
-
-6. **Install on phone:**
-   - Uninstall original Frever app
-   - Settings → Apps → Special Access → Install unknown apps
-   - Open downloaded APK → Install
-
-### Option B: Cloud Deployment (Railway)
-
-1. Go to https://railway.app
-2. Sign in with GitHub
-3. New Project → Deploy from GitHub
-4. Repository: https://github.com/fffoxie/FPLFS
-
-## APK Patching
-
-### Pre-patched APK (Ready to Use)
-Download: https://gofile.io/d/yvEYLNE4
-
-### Patch Your Own APK
-```bash
-python3 patcher.py Frever.apk 192.168.1.XXX:3000
-```
+### 4. Install on phone
+1. Uninstall original Frever
+2. Settings → Apps → Special Access → Install unknown apps
+3. Open downloaded APK → Install
+4. Open Frever → login/register
 
 ## API Endpoints
 
 | Endpoint | Method | Description |
-|----------|--------|-------------|
+|---|---|---|
 | `/health` | GET | Health check |
 | `/connect/token` | POST | OAuth token exchange |
 | `/account/register` | POST | Register account |
@@ -70,8 +49,8 @@ python3 patcher.py Frever.apk 192.168.1.XXX:3000
 ## Resources
 
 - **Patched APK:** https://gofile.io/d/yvEYLNE4
-- **Server ZIP:** https://gofile.io/d/GpGUemDe (111MB)
 - **GitHub:** https://github.com/fffoxie/FPLFS
+- **Render Dashboard:** https://dashboard.render.com
 
 ---
 
