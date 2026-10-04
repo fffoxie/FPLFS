@@ -1,161 +1,145 @@
-# FPLFS Setup Guide - For FFFoxie
+# FPLFS Setup Guide — Cloud Deployment via Rainway
 
 ## Overview
-This guide walks through setting up the Frever Private Local Server (FPLFS) from scratch. All tools are free and school-browser friendly.
+Set up the Frever Private Local Server (FPLFS) entirely in the cloud using Rainway. $0 budget, school-browser friendly.
 
 ## Prerequisites
-- Computer with internet access (school computer works)
+- Rainway account (free at https://rainway.com)
 - Phone with Frever APK installed
-- WiFi network (same network for both devices)
-- GitHub account (school account)
-- VS Code Web account (GitHub login)
+- Same WiFi network as your Rainway-hosted server (or Rainway's public tunnel)
 
-## Step 1: Repository Setup
+## Step 1: Fork the Repository
 
-### 1.1 Fork the repository
 1. Go to https://github.com/fffoxie/FPLFS
-2. Click "Fork" button
-3. Your fork will be at: https://github.com/YOUR_USERNAME/FPLFS
+2. Click **Fork**
+3. Your fork: https://github.com/YOUR_USERNAME/FPLFS
 
-### 1.2 Open in VS Code Web
-1. Go to https://vscode.dev/
-2. Click "Open Repository"
-3. Enter: YOUR_USERNAME/FPLFS
-4. Sign in with GitHub
-5. Wait for repository to load
+## Step 2: Deploy on Rainway
 
-## Step 2: Install Dependencies
+### 2.1 Sign up for Rainway
+1. Go to https://rainway.com
+2. Sign up (free tier)
+3. Download the Rainway app to your computer
+4. Install and sign in
 
-### 2.1 Open Terminal
-1. In VS Code: Terminal → New Terminal
-2. Run: `npm install`
-3. Wait for installation (can take 2-5 minutes)
-
-### 2.2 Create data directory
+### 2.2 Open your repo in Rainway's cloud computer
+1. In Rainway, open **Files** or connect to your cloud computer
+2. Clone your forked repo:
 ```bash
+git clone https://github.com/YOUR_USERNAME/FPLFS.git
+cd FPLFS
+```
+
+### 2.3 Install dependencies
+```bash
+npm install
 mkdir data
 ```
 
-## Step 3: Configure Environment
-
-### 3.1 Create .env file
-Create a file named `.env` in the root with:
-```
+### 2.4 Create .env file
+```bash
+cat > .env << 'EOF'
 JWT_SECRET=your-super-secret-key-here
 VIDEO_BASE_URL=https://example.com/videos
 AVATAR_BASE_URL=https://example.com/avatars
 PORT=3000
+EOF
 ```
 
-### 3.2 Get your computer's IP address
-- **Windows**: Open Command Prompt → `ipconfig` → Look for IPv4 Address under WiFi adapter
-- **Mac**: System Settings → Network → Wi-Fi → IP address
-- **Linux**: Terminal → `hostname -I`
-
-Example IP: `192.168.1.45`
-
-## Step 4: Start the Server
-
-### 4.1 Start the server
-In VS Code terminal:
+### 2.5 Start the server
 ```bash
 npm start
 ```
 
-Server should output:
-```
-FPLFS server running on port 3000
-```
+Rainway exposes port 3000 through its tunnel. Copy the Rainway URL (format: `https://[id].play.rainway.com`).
 
-### 4.2 Keep terminal open
-Leave VS Code running. The server needs to stay active.
+### 2.6 Keep the server running
+Leave the terminal open. Rainway keeps the session alive while connected.
 
-## Step 5: Patch the APK
+## Step 3: Patch the APK
 
-### 5.1 Download APK patcher
-1. Download: https://gofile.io/d/yvEYLNE4 (Frever-FPS.apk)
+### 3.1 Download the pre-patched APK
+- https://gofile.io/d/yvEYLNE4
 
-### 5.2 If you need to patch your own APK
-Use Python script `patcher.py`:
+### 3.2 Or patch your own APK for Rainway
 ```bash
-python3 patcher.py original.apk YOUR_IP:3000
+python3 patcher.py original.apk https://YOUR_ID.play.rainway.com
 ```
 
-## Step 6: Connect Phone
+## Step 4: Connect Phone
 
-### 6.1 Install APK on phone
-1. Uninstall original Frever app
-2. Enable unknown apps: Settings → Apps → Special Access → Install unknown apps
-3. Open downloaded APK → Install
+1. **Uninstall** original Frever app
+2. Enable unknown apps: **Settings → Apps → Special Access → Install unknown apps**
+3. Open downloaded APK → **Install**
+4. Open Frever → login/register
+5. Videos should load from your cloud server
 
-### 6.2 Launch Frever
-1. Open Frever app
-2. Login/register as normal
-3. Videos should load from your local server
+## Step 5: Verify Everything Works
+
+- Health check: `curl https://YOUR_ID.play.rainway.com/health`
+- Client URLs: `curl https://YOUR_ID.play.rainway.com/api/client/urls`
+- Supported versions: `curl https://YOUR_ID.play.rainway.com/api/Client/SupportedVersions`
 
 ## Troubleshooting
 
-### Server won't start
-- Check port 3000 isn't blocked
-- Verify node version: `node --version` (should be 18+)
+### Server won't start on Rainway
+- Check Node version: `node --version` (needs 18+)
 - Delete node_modules and retry: `rm -rf node_modules && npm install`
+- Check port isn't blocked: `netstat -tlnp | grep 3000`
 
-### Phone can't connect
-- Verify both devices on same WiFi
-- Check computer firewall allows port 3000
-- Try different port: change `PORT=3000` to `PORT=4000` in .env
+### Phone can't connect to Rainway URL
+- Make sure both devices are on the same network (or Rainway tunnel handles it)
+- Try a different port in `.env` (e.g., `PORT=4000`)
+- Check Rainway's firewall/port settings
 
-### Permission errors
-- Run VS Code as administrator (Windows)
-- Or use different port that doesn't require admin
-
-## Cloud Deployment Alternative (Railway)
-
-If local WiFi doesn't work:
-
-1. Go to https://railway.app
-2. Sign in with GitHub
-3. New Project → Deploy from GitHub
-4. Select YOUR_USERNAME/FPLFS
-5. Click "Deploy"
-6. Wait for deployment (2-3 minutes)
-7. Copy the Railway URL
-8. Patch APK to use that URL instead of IP
+### Permission errors on Rainway
+- Rainway cloud computer may have restricted permissions
+- Try a port above 1024 (e.g., 3000, 4000, 8080)
+- Run `npm start` without sudo
 
 ## File Structure
 
 ```
 FPLFS/
-├── package.json          # Dependencies and scripts
-├── README.md             # Documentation
-├── .gitignore            # Git ignore rules
-├── .env                  # Environment variables (create this)
-├── data/                 # Database files (create this)
-├── src/
-│   ├── index.js          # Main server entry
-│   ├── bridge.js         # Protobuf router
-│   ├── database.js       # SQLite setup
-│   └── routes/
-│       ├── auth.js       # Login/register
-│       ├── profile.js    # User profile
-│       ├── video.js      # Video feed
-│       ├── social.js     # Likes/follows
-│       ├── crew.js       # Crews
-│       ├── chat.js       # Chat
-│       ├── wardrobe.js   # Characters
-│       ├── task.js       # Tasks
-│       ├── asset.js      # Assets
-│       └── misc.js       # Misc endpoints
-└── proto/
-    └── bridge.proto      # Protobuf definitions
+├── README.md
+├── SETUP_GUIDE.md
+├── package.json
+├── .gitignore
+├── patcher.py
+├── proto/
+│   └── bridge.proto
+└── src/
+    ├── index.js
+    ├── database.js
+    ├── bridge.js
+    └── routes/
+        ├── auth.js
+        ├── profile.js
+        ├── video.js
+        ├── social.js
+        ├── crew.js
+        ├── chat.js
+        ├── wardrobe.js
+        ├── task.js
+        ├── asset.js
+        └── misc.js
 ```
 
-## Next Steps
+## Quick Reference
 
-1. Test all endpoints at http://YOUR_IP:3000/health
-2. Add video upload functionality
-3. Implement real video storage
-4. Add user profiles and avatars
+```bash
+# Clone and setup
+git clone https://github.com/YOUR_USERNAME/FPLFS.git
+cd FPLFS
+npm install
+mkdir data
+
+# Start server
+npm start
+
+# Patch APK for Rainway URL
+python3 patcher.py Frever.apk https://YOUR_ID.play.rainway.com
+```
 
 ---
 **Created by FFFoxie • MIT License**
